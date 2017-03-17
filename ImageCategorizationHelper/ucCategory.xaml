@@ -5,15 +5,29 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:ImageCategorizationHelper"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="20"
-    d:DesignWidth="80"
-    mc:Ignorable="d" x:Name="UC">
-    <Grid x:Name="layoutRoot" MouseLeftButtonDown="layoutRoot_MouseLeftButtonDown">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="20" />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-        <TextBox x:Name="tbKey" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False" MaxLength="1"/>
-        <TextBox x:Name="tbCategory" Grid.Column="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"/>
-    </Grid>
+    x:Name="UC"
+    d:DesignHeight="30"
+    d:DesignWidth="90"
+    mc:Ignorable="d"
+    IsTabStop="True">
+    <Border x:Name="border" BorderThickness="1" BorderBrush="LightGray" Margin="5">
+        <Grid
+            x:Name="layoutRoot"
+            MouseLeftButtonDown="layoutRoot_MouseLeftButtonDown">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20" />
+                <ColumnDefinition MinWidth="40"/>
+            </Grid.ColumnDefinitions>
+            <Border BorderBrush="LightGray" BorderThickness="1">
+            <TextBlock
+                x:Name="tbKey"
+                />
+            </Border>
+            <Border BorderBrush="LightGray" BorderThickness="1" Grid.Column="1">
+                <TextBlock
+                x:Name="tbCategory"
+                />
+            </Border>
+        </Grid>
+    </Border>
 </UserControl>

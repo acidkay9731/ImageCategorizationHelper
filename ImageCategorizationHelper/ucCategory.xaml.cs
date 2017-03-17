@@ -22,20 +22,50 @@ namespace ImageCategorizationHelper
     {
         string[] hashItem = new string[2];
 
-        public ucCategory()
+        MainWindow parent = null;
+
+        public bool IsSelected = false;
+
+        Brush brDefault;
+        Brush brSelect;
+
+        public ucCategory(MainWindow mw, string strKey, string strValue)
         {
             InitializeComponent();
+
+            parent = mw;
+
+            brDefault = border.BorderBrush;
+            brSelect = Brushes.Red;
+
+            tbKey.Text = strKey;
+            tbCategory.Text = strValue;
         }
 
-        public void SetEnable(bool IsEnable)
+        public void SetSelect(bool IsEnable)
         {
-            this.tbKey.IsEnabled = IsEnabled;
-            this.tbCategory.IsEnabled = IsEnabled;
+            if (IsEnable)
+            {
+                border.BorderBrush = brSelect;
+                this.IsSelected = true;
+
+                if (parent.selectCategory != null)
+                {
+                    parent.selectCategory.SetSelect(false);
+                }
+
+                parent.selectCategory = this;
+            }
+            else
+            {
+                border.BorderBrush = brDefault;
+                this.IsSelected = false;
+            }
         }
 
         private void layoutRoot_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            this.SetEnable(true);
+            this.SetSelect(true);
         }
     }
 }

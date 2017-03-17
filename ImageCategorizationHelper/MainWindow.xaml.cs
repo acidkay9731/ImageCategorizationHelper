@@ -21,11 +21,44 @@ namespace ImageCategorizationHelper
     /// </summary>
     public partial class MainWindow : Window
     {
-        Hashtable htCategory = new Hashtable();
+        public Hashtable htCategory = new Hashtable();
+        public ArrayList alKeys = new ArrayList();
+        public ArrayList alValues = new ArrayList();
+        public ucCategory selectCategory = null;
 
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void btnCAdd_Click(object sender, RoutedEventArgs e)
+        {
+            winCategory winCategory = new winCategory(this);
+
+            winCategory.Owner = this;
+
+            if (winCategory.ShowDialog() == true)
+            {
+                ucCategory ucCategory = new ucCategory(this, winCategory.tbKey.Text, winCategory.tbCategory.Text);
+                wpCategory.Children.Add(ucCategory);
+
+                alKeys.Add(winCategory.tbKey.Text);
+                alValues.Add(winCategory.tbCategory.Text);
+                htCategory.Add(winCategory.tbKey.Text, ucCategory);
+            }
+        }
+
+        private void btnCEdit_Click(object sender, RoutedEventArgs e)
+        {
+            if(selectCategory == null)
+            {
+                MessageBox.Show("Select Category.");
+            }
+        }
+
+        private void btnCDelete_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

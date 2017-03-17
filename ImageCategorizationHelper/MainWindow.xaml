@@ -68,22 +68,22 @@
                     <Button
                         x:Name="btnCAdd"
                         Margin="5"
-                        Content="Add" />
+                        Content="Add" Click="btnCAdd_Click" />
                     <Button
                         x:Name="btnCEdit"
                         Grid.Column="1"
                         Margin="5"
-                        Content="Edit" />
+                        Content="Edit" Click="btnCEdit_Click" />
                     <Button
                         x:Name="btnCDelete"
                         Grid.Column="2"
                         Margin="5"
-                        Content="Delete" />
+                        Content="Delete" Click="btnCDelete_Click" />
                 </Grid>
             </Grid>
             <Grid Grid.Row="1">
                 <Border BorderThickness="1" Margin="5" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
-                    <WrapPanel x:Name="wpCategory" />
+                    <WrapPanel x:Name="wpCategory"/>
                 </Border>
             </Grid>
         </Grid>
