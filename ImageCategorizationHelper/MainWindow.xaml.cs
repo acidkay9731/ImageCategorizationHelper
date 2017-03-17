@@ -56,6 +56,7 @@ namespace ImageCategorizationHelper
                     ucCategory uccategory = new ucCategory(this, split[0], split[1]);
 
                     wpCategory.Children.Add(uccategory);
+                    htCategiry.Add(split[0], uccategory);
                 }
             }
         }
@@ -173,9 +174,8 @@ namespace ImageCategorizationHelper
 
                 try
                 {
-                    ImageSource imageSource = new BitmapImage(new Uri(selectListBoxItem.Tag.ToString()));
-
-                    imgMain.Source = imageSource;
+                    ImageSource imageSrc = BitmapFromUri(new Uri(selectListBoxItem.Tag.ToString()));
+                    imgMain.Source = imageSrc;
                 }
                 catch(Exception ex)
                 {
@@ -186,6 +186,16 @@ namespace ImageCategorizationHelper
                     selectListBoxItem.Background = Brushes.Red;
                 }
             }
+        }
+
+        public static ImageSource BitmapFromUri(Uri source)
+        {
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.UriSource = source;
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.EndInit();
+            return bitmap;
         }
 
         private void MW_KeyUp(object sender, KeyEventArgs e)
@@ -205,15 +215,35 @@ namespace ImageCategorizationHelper
 
                 try
                 {
-                    File.Move(selectListBoxItem.Tag.ToString(), categoryPath + selectListBoxItem.Content.ToString());
+                    imgMain.Source = null;
+                    File.Move(selectListBoxItem.Tag.ToString(), tbSelectFolder.Text + "\\" + selectListBoxItem.Content.ToString());
+                    lstFiles.Items.Remove(selectListBoxItem);
                 }
                 catch(Exception ex)
                 {
                     string err = ex.Message + "\r\n" + ex.StackTrace;
                     tbLog.Text += err;
                     tbLog.ScrollToEnd();
+                    selectListBoxItem.Background = Brushes.Red;
                 }
 
+                SelectNextListBoxItem();
+            }
+        }
+
+        private void SelectNextListBoxItem()
+        {
+            selectListBoxItem = null;
+
+            for(int i = 0; i< lstFiles.Items.Count; i++)
+            {
+                ListBoxItem lbi = lstFiles.Items[i] as ListBoxItem;
+
+                if(lbi.Background != Brushes.Red)
+                {
+                    selectListBoxItem = lbi;
+                    break;
+                }
             }
         }
     }
