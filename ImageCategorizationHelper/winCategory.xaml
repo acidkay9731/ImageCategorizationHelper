@@ -24,8 +24,8 @@
         </Grid.RowDefinitions>
         <Label Content="Key" VerticalContentAlignment="Center"/>
         <Label Grid.Row="1" Content="Category" VerticalContentAlignment="Center"/>
-        <TextBox x:Name="tbKey" Grid.Column="1" VerticalContentAlignment="Center" MaxLength="1" PreviewKeyDown="tbKey_PreviewKeyDown" Margin="5" TextChanged="tbKey_TextChanged"/>
-        <TextBox x:Name="tbCategory" Grid.Row="1" Grid.Column="1" VerticalContentAlignment="Center" MaxLength="32" PreviewKeyDown="tbCategory_PreviewKeyDown" Margin="5" KeyUp="tbCategory_KeyUp"/>
+        <TextBox CharacterCasing="Upper" x:Name="tbKey" Grid.Column="1" VerticalContentAlignment="Center" MaxLength="1" PreviewKeyDown="tbKey_PreviewKeyDown" Margin="5" TextChanged="tbKey_TextChanged"/>
+        <TextBox CharacterCasing="Upper" x:Name="tbCategory" Grid.Row="1" Grid.Column="1" VerticalContentAlignment="Center" MaxLength="32" PreviewKeyDown="tbCategory_PreviewKeyDown" Margin="5" KeyUp="tbCategory_KeyUp"/>
         <Grid Grid.Row="2" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>

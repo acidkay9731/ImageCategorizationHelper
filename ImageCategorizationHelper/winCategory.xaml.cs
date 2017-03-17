@@ -30,6 +30,16 @@ namespace ImageCategorizationHelper
             parent = mw;
         }
 
+        public winCategory(MainWindow mw, ucCategory category)
+        {
+            InitializeComponent();
+
+            parent = mw;
+
+            tbKey.Text = category.tbKey.Text;
+            tbCategory.Text = category.tbCategory.Text;
+        }
+
         private void btnOK_Click(object sender, RoutedEventArgs e)
         {
             OK();
@@ -50,7 +60,7 @@ namespace ImageCategorizationHelper
                 tbKey.Focus();
                 tbKey.SelectAll();
             }
-            else if (parent.alValues.Contains(tbCategory.Text))
+            else if (parent.alCategory.Contains(tbCategory.Text))
             {
                 MessageBox.Show("Existing Category.");
                 tbCategory.Focus();
@@ -74,7 +84,6 @@ namespace ImageCategorizationHelper
             {
                 e.Handled = true;
             }
-         
         }
 
         private void tbKey_TextChanged(object sender, TextChangedEventArgs e)

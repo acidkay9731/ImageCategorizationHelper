@@ -25,17 +25,18 @@
         <Grid x:Name="grdFileList" Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="40" />
+                <RowDefinition Height="40" />
                 <RowDefinition />
             </Grid.RowDefinitions>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="85" />
+                    <ColumnDefinition Width="90" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <Button
                     x:Name="btnSelFolder"
                     Margin="5"
-                    Content="Select Folder" />
+                    Content="Select Folder" Click="btnSelFolder_Click" />
                 <TextBox
                     x:Name="tbSelectFolder"
                     Grid.Column="1"
@@ -43,10 +44,12 @@
                     HorizontalAlignment="Stretch"
                     IsReadOnly="True" />
             </Grid>
+            <Button Grid.Row="1" x:Name="btnStart" Margin="5" Content="START CATEGORIZATION" Click="btnStart_Click"/>
             <ListBox
                 x:Name="lstFiles"
-                Grid.Row="1"
-                Margin="5" />
+                Grid.Row="2"
+                Margin="5"
+                IsEnabled="False"/>
         </Grid>
         <Grid Grid.Row="1" Grid.Column="1">
             <Grid.RowDefinitions>
@@ -55,10 +58,10 @@
             </Grid.RowDefinitions>
             <Grid Margin="5" Background="LightGray">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="90" />
+                    <ColumnDefinition Width="110" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <Label VerticalContentAlignment="Center" Content="Category Edit" />
+                <Label VerticalContentAlignment="Center" Content="Category Setting" />
                 <Grid Grid.Column="1" HorizontalAlignment="Stretch">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
@@ -70,15 +73,15 @@
                         Margin="5"
                         Content="Add" Click="btnCAdd_Click" />
                     <Button
-                        x:Name="btnCEdit"
+                        x:Name="btnCDelete"
                         Grid.Column="1"
                         Margin="5"
-                        Content="Edit" Click="btnCEdit_Click" />
+                        Content="Delete" Click="btnCDelete_Click" />
                     <Button
-                        x:Name="btnCDelete"
+                        x:Name="btnCSave"
                         Grid.Column="2"
                         Margin="5"
-                        Content="Delete" Click="btnCDelete_Click" />
+                        Content="Save" Click="btnCSave_Click" />
                 </Grid>
             </Grid>
             <Grid Grid.Row="1">
