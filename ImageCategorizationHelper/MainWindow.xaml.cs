@@ -56,6 +56,9 @@ namespace ImageCategorizationHelper
                     ucCategory uccategory = new ucCategory(this, split[0], split[1]);
 
                     wpCategory.Children.Add(uccategory);
+
+                    alKeys.Add(split[0]);
+                    alCategory.Add(split[1]);
                     htCategiry.Add(split[0], uccategory);
                 }
             }
@@ -87,6 +90,8 @@ namespace ImageCategorizationHelper
             else
             {
                 wpCategory.Children.Remove(selectCategory);
+                alKeys.Remove(selectCategory.tbKey.Text);
+                alCategory.Remove(selectCategory.tbCategory.Text);
                 htCategiry.Remove(selectCategory.tbKey.Text);
 
                 selectCategory = null;
@@ -101,7 +106,7 @@ namespace ImageCategorizationHelper
                 MessageBox.Show("There are no Categories.");
                 return;
 #else
-                MessageBox.Show("Clear Categorie list.");
+                MessageBox.Show("Clear Categories.");
 #endif
             }
 
@@ -112,6 +117,8 @@ namespace ImageCategorizationHelper
                     sw.WriteLine(category.tbKey.Text + ":" + category.tbCategory.Text);
                 }
             }
+
+            MessageBox.Show("Save Categories Complite.");
         }
 
         private void btnSelFolder_Click(object sender, RoutedEventArgs e)
@@ -139,6 +146,8 @@ namespace ImageCategorizationHelper
 
                 lstFiles.Items.Add(lbi);
             }
+
+            tbImageCount.Text = lstFiles.Items.Count.ToString();
         }
 
         private void btnStart_Click(object sender, RoutedEventArgs e)
@@ -159,6 +168,8 @@ namespace ImageCategorizationHelper
 
         private void SetImage()
         {
+            selectListBoxItem = null;
+
             if (lstFiles.Items.Count != 0)
             {
                 for(int i = 0; i < lstFiles.Items.Count; i++)
@@ -174,8 +185,37 @@ namespace ImageCategorizationHelper
 
                 try
                 {
-                    ImageSource imageSrc = BitmapFromUri(new Uri(selectListBoxItem.Tag.ToString()));
-                    imgMain.Source = imageSrc;
+                    string imageName = selectListBoxItem.Tag.ToString();
+
+                    string extName = imageName.Split('.')[imageName.Split('.').Length - 1].ToUpper();
+
+                    if (extName == "GIF")
+                    {
+                        mediaElement.Visibility = Visibility.Hidden;
+                        imgMain.Visibility = Visibility.Hidden;
+
+                        wfhImgGif.Visibility = Visibility.Visible;
+                        imgGif.ImageLocation = imageName;
+
+                    }
+                    else if(extName == "MP4")
+                    {
+                        wfhImgGif.Visibility = Visibility.Hidden;
+                        imgMain.Visibility = Visibility.Hidden;
+
+                        mediaElement.Visibility = Visibility.Visible;
+                        mediaElement.Source = new Uri(imageName);
+                        //mediaElement.Play();
+                    }
+                    else
+                    {
+                        wfhImgGif.Visibility = Visibility.Hidden;
+                        mediaElement.Visibility = Visibility.Hidden;
+
+                        imgMain.Visibility = Visibility.Visible;
+                        ImageSource imageSrc = BitmapFromUri(new Uri(imageName));
+                        imgMain.Source = imageSrc;
+                    }
                 }
                 catch(Exception ex)
                 {
@@ -190,23 +230,42 @@ namespace ImageCategorizationHelper
 
         public static ImageSource BitmapFromUri(Uri source)
         {
+            string ext = source.AbsolutePath.Split('.')[source.AbsolutePath.Split('.').Length - 1].ToUpper();
+
             var bitmap = new BitmapImage();
+
             bitmap.BeginInit();
             bitmap.UriSource = source;
             bitmap.CacheOption = BitmapCacheOption.OnLoad;
             bitmap.EndInit();
+
             return bitmap;
         }
 
         private void MW_KeyUp(object sender, KeyEventArgs e)
         {
+            //var alt = e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Alt);
+            var ctrl = e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control);
+            //var altGr = alt & ctrl;
+            //var shift = e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Shift);
+
+            if(ctrl == true)
+            {
+                if (e.Key == Key.Z)
+                {
+                    undo();
+                }
+
+                return;
+            }
+
             object obj = htCategiry[e.Key.ToString().ToUpper()];
 
             if(obj != null)
             {
                 ucCategory category = obj as ucCategory;
 
-                string categoryPath = strPath + "\\" + category.tbCategory.Text;
+                string categoryPath = tbSelectFolder.Text + "\\" + category.tbCategory.Text;
 
                 if (!Directory.Exists(categoryPath))
                 {
@@ -216,7 +275,12 @@ namespace ImageCategorizationHelper
                 try
                 {
                     imgMain.Source = null;
-                    File.Move(selectListBoxItem.Tag.ToString(), tbSelectFolder.Text + "\\" + selectListBoxItem.Content.ToString());
+
+                    string strTrgetName = categoryPath + "\\" + selectListBoxItem.Content.ToString();
+                    File.Move(selectListBoxItem.Tag.ToString(), strTrgetName);
+                    File.SetLastAccessTime(strTrgetName, DateTime.Now);
+                    tbLog.Text += "\n" + selectListBoxItem.Tag.ToString() + "→" + strTrgetName;
+                    tbLog.ScrollToEnd();
                     lstFiles.Items.Remove(selectListBoxItem);
                 }
                 catch(Exception ex)
@@ -227,24 +291,73 @@ namespace ImageCategorizationHelper
                     selectListBoxItem.Background = Brushes.Red;
                 }
 
-                SelectNextListBoxItem();
+                //SelectNextListBoxItem();
+                SetImage();
+
+                tbImageCount.Text = lstFiles.Items.Count.ToString();
             }
         }
 
-        private void SelectNextListBoxItem()
+        private void undo()
         {
-            selectListBoxItem = null;
+            string strUndo = tbLog.Text.Split('\n')[tbLog.Text.Split('\n').Length - 1];
 
-            for(int i = 0; i< lstFiles.Items.Count; i++)
+            if(strUndo.Trim().Length == 0
+                || !strUndo.Contains("→"))
             {
-                ListBoxItem lbi = lstFiles.Items[i] as ListBoxItem;
-
-                if(lbi.Background != Brushes.Red)
-                {
-                    selectListBoxItem = lbi;
-                    break;
-                }
+                return;
             }
+
+            string [] strSplit = strUndo.Split('→');
+
+            try
+            {
+                File.Move(strSplit[1], strSplit[0]);
+                File.SetLastAccessTime(strSplit[0], DateTime.Now);
+                ListBoxItem lbi = new ListBoxItem();
+
+                lbi.Content = strSplit[0].Split('\\')[strSplit[0].Split('\\').Length - 1];
+                lbi.Tag = strSplit[0];
+
+                lstFiles.Items.Insert(0, lbi);
+
+                tbLog.Text = tbLog.Text.Replace("\n" + strUndo, "");
+
+                tbLog.ScrollToEnd();
+
+                SetImage();
+            }
+            catch(Exception ex)
+            {
+                string err = ex.Message + "\n" + ex.StackTrace;
+                tbLog.Text += err;
+                tbLog.ScrollToEnd();
+            }
+
+            tbImageCount.Text = lstFiles.Items.Count.ToString();
         }
+
+        private void mediaElement_MediaEnded(object sender, RoutedEventArgs e)
+        {
+            mediaElement.Position = TimeSpan.FromMilliseconds(1);
+            //mediaElement.LoadedBehavior = MediaState.Play;
+            //mediaElement.Play();
+        }
+
+        //private void SelectNextListBoxItem()
+        //{
+        //    selectListBoxItem = null;
+
+        //    for(int i = 0; i< lstFiles.Items.Count; i++)
+        //    {
+        //        ListBoxItem lbi = lstFiles.Items[i] as ListBoxItem;
+
+        //        if(lbi.Background != Brushes.Red)
+        //        {
+        //            selectListBoxItem = lbi;
+        //            break;
+        //        }
+        //    }
+        //}
     }
 }

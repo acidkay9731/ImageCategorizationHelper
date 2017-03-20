@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:ImageCategorizationHelper"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:winForms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
     x:Name="MW"
     Title="MainWindow"
     Width="1024"
@@ -20,7 +21,14 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <Border BorderThickness="1" Margin="5" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" >
-            <Image x:Name="imgMain" Width="640" Height="480"/>
+            <Grid>
+                <WindowsFormsHost x:Name="wfhImgGif">
+                    <winForms:PictureBox x:Name="imgGif">
+                    </winForms:PictureBox>
+                </WindowsFormsHost>
+                <MediaElement x:Name="mediaElement" LoadedBehavior="Play" UnloadedBehavior="Play" MediaEnded="mediaElement_MediaEnded"/>
+                <Image x:Name="imgMain"  Width="640" Height="480"/>
+            </Grid>
         </Border>
         <Grid x:Name="grdFileList" Grid.Column="1">
             <Grid.RowDefinitions>
@@ -44,7 +52,21 @@
                     HorizontalAlignment="Stretch"
                     IsReadOnly="True" />
             </Grid>
-            <Button Grid.Row="1" x:Name="btnStart" Margin="5" Content="START CATEGORIZATION" Click="btnStart_Click"/>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="130"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="btnStart" Margin="5" Content="START CATEGORIZATION" Click="btnStart_Click"/>
+                <Grid Grid.Column="1" Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="40"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Image Count" VerticalContentAlignment="Center"/>
+                    <TextBlock x:Name="tbImageCount" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1" Text="10000"></TextBlock>
+                </Grid>
+            </Grid>
             <ListBox
                 x:Name="lstFiles"
                 Grid.Row="2"
@@ -91,7 +113,8 @@
             </Grid>
         </Grid>
         <Grid Grid.Row="1">
-            <TextBox x:Name="tbLog" Margin="5" IsReadOnly="True" />
+            <TextBox x:Name="tbLog" Margin="5" IsReadOnly="True" TextWrapping="Wrap"/>
         </Grid>
+        
     </Grid>
 </Window>
