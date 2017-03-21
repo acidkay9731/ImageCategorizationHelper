@@ -320,7 +320,6 @@ namespace ImageCategorizationHelper
                         selectListBoxItem.Background = Brushes.Red;
                     }
 
-                    //SelectNextListBoxItem();
                     SetImage();
 
                     tbImageCount.Text = lstFiles.Items.Count.ToString();
@@ -373,28 +372,5 @@ namespace ImageCategorizationHelper
 
             tbImageCount.Text = lstFiles.Items.Count.ToString();
         }
-
-        //private void mediaElement_MediaEnded(object sender, RoutedEventArgs e)
-        //{
-        //    mediaElement.Position = TimeSpan.FromMilliseconds(1);
-        //    //mediaElement.LoadedBehavior = MediaState.Play;
-        //    //mediaElement.Play();
-        //}
-
-        //private void SelectNextListBoxItem()
-        //{
-        //    selectListBoxItem = null;
-
-        //    for(int i = 0; i< lstFiles.Items.Count; i++)
-        //    {
-        //        ListBoxItem lbi = lstFiles.Items[i] as ListBoxItem;
-
-        //        if(lbi.Background != Brushes.Red)
-        //        {
-        //            selectListBoxItem = lbi;
-        //            break;
-        //        }
-        //    }
-        //}
     }
 }
