@@ -124,7 +124,7 @@ namespace ImageCategorizationHelper
         private void btnSelFolder_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new System.Windows.Forms.FolderBrowserDialog();
-
+            
             if(dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 tbSelectFolder.Text = dialog.SelectedPath;
@@ -135,6 +135,8 @@ namespace ImageCategorizationHelper
 
         private void SetImageList()
         {
+            lstFiles.Items.Clear();
+
             string [] imageList = Directory.GetFiles(tbSelectFolder.Text);
 
             foreach(string imageName in imageList)
@@ -164,6 +166,20 @@ namespace ImageCategorizationHelper
                 btnStart.Content = "START CATEGORIZATION";
                 MW.KeyUp -= MW_KeyUp;
             }
+        }
+
+        public static ImageSource BitmapFromUri(Uri source)
+        {
+            string ext = source.AbsolutePath.Split('.')[source.AbsolutePath.Split('.').Length - 1].ToUpper();
+
+            var bitmap = new BitmapImage();
+
+            bitmap.BeginInit();
+            bitmap.UriSource = source;
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.EndInit();
+
+            return bitmap;
         }
 
         private void SetImage()
@@ -205,7 +221,7 @@ namespace ImageCategorizationHelper
 
                         mediaElement.Visibility = Visibility.Visible;
                         mediaElement.Source = new Uri(imageName);
-                        //mediaElement.Play();
+                        mediaElement.Play();
                     }
                     else
                     {
@@ -228,73 +244,92 @@ namespace ImageCategorizationHelper
             }
         }
 
-        public static ImageSource BitmapFromUri(Uri source)
+        private void ReleaseResources()
         {
-            string ext = source.AbsolutePath.Split('.')[source.AbsolutePath.Split('.').Length - 1].ToUpper();
+            imgMain.Source = null;
 
-            var bitmap = new BitmapImage();
+            if (imgGif.Image != null)
+            {
+                imgGif.Image.Dispose();
+                imgGif.ImageLocation = null;
+            }
 
-            bitmap.BeginInit();
-            bitmap.UriSource = source;
-            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-            bitmap.EndInit();
-
-            return bitmap;
+            mediaElement.Stop();
+            mediaElement.Source = null;
         }
 
         private void MW_KeyUp(object sender, KeyEventArgs e)
         {
-            //var alt = e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Alt);
-            var ctrl = e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control);
-            //var altGr = alt & ctrl;
-            //var shift = e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Shift);
-
-            if(ctrl == true)
+            try
             {
-                if (e.Key == Key.Z)
+                //var alt = e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Alt);
+                var ctrl = e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control);
+                //var altGr = alt & ctrl;
+                //var shift = e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Shift);
+
+                if (ctrl == true)
                 {
-                    undo();
+                    if (e.Key == Key.Z)
+                    {
+                        undo();
+                    }
+
+                    return;
                 }
 
-                return;
+                object obj = htCategiry[e.Key.ToString().ToUpper()];
+
+                if (obj != null)
+                {
+                    ucCategory category = obj as ucCategory;
+
+                    string categoryPath = tbSelectFolder.Text + "\\" + category.tbCategory.Text;
+
+                    if (!Directory.Exists(categoryPath))
+                    {
+                        Directory.CreateDirectory(categoryPath);
+                    }
+
+                    try
+                    {
+                        ReleaseResources();
+
+                        string strTrgetName = categoryPath + "\\" + selectListBoxItem.Content.ToString();
+
+                        try
+                        {
+                            File.SetLastAccessTime(selectListBoxItem.Tag.ToString(), DateTime.Now);
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Threading.Thread.Sleep(1000);
+                            File.SetLastAccessTime(selectListBoxItem.Tag.ToString(), DateTime.Now);
+                        }
+
+                        File.Move(selectListBoxItem.Tag.ToString(), strTrgetName);
+
+                        tbLog.Text += "\n" + selectListBoxItem.Tag.ToString() + "→" + strTrgetName;
+                        tbLog.ScrollToEnd();
+                        lstFiles.Items.Remove(selectListBoxItem);
+                    }
+                    catch (Exception ex)
+                    {
+                        string err = ex.Message + "\r\n" + ex.StackTrace;
+                        tbLog.Text += err;
+                        tbLog.ScrollToEnd();
+                        selectListBoxItem.Background = Brushes.Red;
+                    }
+
+                    //SelectNextListBoxItem();
+                    SetImage();
+
+                    tbImageCount.Text = lstFiles.Items.Count.ToString();
+                }
             }
-
-            object obj = htCategiry[e.Key.ToString().ToUpper()];
-
-            if(obj != null)
+            catch(Exception ex)
             {
-                ucCategory category = obj as ucCategory;
-
-                string categoryPath = tbSelectFolder.Text + "\\" + category.tbCategory.Text;
-
-                if (!Directory.Exists(categoryPath))
-                {
-                    Directory.CreateDirectory(categoryPath);
-                }
-
-                try
-                {
-                    imgMain.Source = null;
-
-                    string strTrgetName = categoryPath + "\\" + selectListBoxItem.Content.ToString();
-                    File.Move(selectListBoxItem.Tag.ToString(), strTrgetName);
-                    File.SetLastAccessTime(strTrgetName, DateTime.Now);
-                    tbLog.Text += "\n" + selectListBoxItem.Tag.ToString() + "→" + strTrgetName;
-                    tbLog.ScrollToEnd();
-                    lstFiles.Items.Remove(selectListBoxItem);
-                }
-                catch(Exception ex)
-                {
-                    string err = ex.Message + "\r\n" + ex.StackTrace;
-                    tbLog.Text += err;
-                    tbLog.ScrollToEnd();
-                    selectListBoxItem.Background = Brushes.Red;
-                }
-
-                //SelectNextListBoxItem();
-                SetImage();
-
-                tbImageCount.Text = lstFiles.Items.Count.ToString();
+                string err = ex.Message + "\n" + ex.StackTrace;
+                MessageBox.Show(err);
             }
         }
 
@@ -307,6 +342,8 @@ namespace ImageCategorizationHelper
             {
                 return;
             }
+
+            ReleaseResources();
 
             string [] strSplit = strUndo.Split('→');
 
@@ -337,12 +374,12 @@ namespace ImageCategorizationHelper
             tbImageCount.Text = lstFiles.Items.Count.ToString();
         }
 
-        private void mediaElement_MediaEnded(object sender, RoutedEventArgs e)
-        {
-            mediaElement.Position = TimeSpan.FromMilliseconds(1);
-            //mediaElement.LoadedBehavior = MediaState.Play;
-            //mediaElement.Play();
-        }
+        //private void mediaElement_MediaEnded(object sender, RoutedEventArgs e)
+        //{
+        //    mediaElement.Position = TimeSpan.FromMilliseconds(1);
+        //    //mediaElement.LoadedBehavior = MediaState.Play;
+        //    //mediaElement.Play();
+        //}
 
         //private void SelectNextListBoxItem()
         //{

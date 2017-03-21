@@ -26,7 +26,7 @@
                     <winForms:PictureBox x:Name="imgGif">
                     </winForms:PictureBox>
                 </WindowsFormsHost>
-                <MediaElement x:Name="mediaElement" LoadedBehavior="Play" UnloadedBehavior="Play" MediaEnded="mediaElement_MediaEnded"/>
+                <MediaElement x:Name="mediaElement" LoadedBehavior="Manual" UnloadedBehavior="Manual"/>
                 <Image x:Name="imgMain"  Width="640" Height="480"/>
             </Grid>
         </Border>
@@ -113,7 +113,7 @@
             </Grid>
         </Grid>
         <Grid Grid.Row="1">
-            <TextBox x:Name="tbLog" Margin="5" IsReadOnly="True" TextWrapping="Wrap"/>
+            <TextBox x:Name="tbLog" Margin="5" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
         </Grid>
         
     </Grid>
